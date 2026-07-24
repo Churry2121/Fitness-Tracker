@@ -178,6 +178,18 @@ The include() function tells Django to look at the URL patterns defined in the t
 
 When someone visits http://127.0.0.1:8000/add/, Django first checks fitness_project/urls.py. It matches the empty prefix and delegates to tracker/urls.py. There, it matches add/ and calls the add_workout view.
 
-## How to Test the Application Locally
+## How to Prepare for Deployment
+Running your app on localhost is great for development, but nobody else can see it. Deployment means putting your app on a server that's accessible from anywhere on the internet. Before you deploy, you'll need to make a few changes to your project's settings.
 
+Open fitness_project/settings.py and make the following changes.
+First, set DEBUG to False. In production, these error pages would expose sensitive information about your code and server to anyone who triggers an error.
+
+Next, update ALLOWED_HOSTS to include **PythonAnywhere**'s domain. This setting tells Django which domain names are allowed to serve your app. Replace your username with the acutal PythonAnywhere username you will create next.
+`ALLOWED_HOST = ['yourusername.pythonanywhere.com].
+
+Finally, add a STATIC_ROOT setting so Django knows where to collect your static files (CSS, JavaScript, images) for production:
+```python
+import os
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+```
 
