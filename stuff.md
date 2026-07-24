@@ -193,3 +193,5 @@ import os
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 ```
 
+**Note:** For a production app handling real user data, you would also want to set a secure SECRET_KEY, configure a proper database like PostgreSQL, and set up HTTPS. But for a learning project, these changes are enough.
+
