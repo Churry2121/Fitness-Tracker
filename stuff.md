@@ -107,3 +107,77 @@ workoutform = WorkoutForm()
 print(workoutform)
 ```
 You should get a output that looks like an HTML layout, containing the id's of the fields of the form you created (i.e. id_activity, id_duration, id_date).
+
+### Writing Views
+In the tracker/views.py file, type the following code:
+```python
+from django.shortcuts import render, redirect
+from .models import Workout
+
+def workout_list(request):
+    workouts = Workout.objects.all().order_by('-date')
+    return render(request, 'tracker/workout_list.html', {'workouts': workouts})
+```
+To create the logic to add a workout, first add the Workout form import at the end of the import seciton. Then add the following code after the workout_list view:
+```python
+from django.shortcuts import render, redirect
+from .models import Workout
+from .forms import WorkoutForm
+
+# view to list all the workouts
+def workout_list(request):
+    workouts = Workout.objects.all().order_by('-date')
+    return render(request, 'tracker/workout_list.html', {'workouts': workouts})
+
+# view to add a workout
+def add_workout(request):
+    if request.method == 'POST': # request method: POST when user fills and submits form
+        form = WorkoutForm(request.POST)
+        if form.is_valid(): # if the form is valid, the form is saved
+            form.save()
+            return redirect('workout_list')
+    else: # else: request method=GET renders a blacnk form and renders it
+        form = WorkoutForm()
+    return render(request, 'tracker/add_workout.html', {'form': form})
+```
+
+## How to Create Templates
+Django looks for templates inside a templates folder within each app. Create the following folder structure inside your tracker app: tracker/templates/tracker.
+The double tracker folder name is a Django convention called template namespacing. It prevents nameing conflicts if you have multiple apps with templates that share the same filename.
+
+## How to Connect URLs
+You need to map URLs to views so that visiting specific address in the browser triggers the right view function.
+
+**How to create App Level URLs:**
+Create a new file called tracker/urls.py and add the following code:
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [ 
+    path('', views.workout_list, name='workout_list'), 
+    path('add/', views.add_workout, name='add_workout'), 
+]
+```
+Each path function takes 3 arguments: 
+1) The route string that represents a URL pattern (an empty string means the root of the app)
+2) The view function to call when that URL is visited.
+3) A name you can use to reference this URL elsewhere in your code, like the {% url %} template tags.
+
+Now that your app-level URLs are set up, the next step is to connect them to the main project so Django knows where to start routing requests. Open fitness_project.urls.py and update it to include your app's URLs:
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('tracker.urls')),
+]
+```
+The include() function tells Django to look at the URL patterns defined in the tracker/urls.py file whenever someone visits your site. **The empty string prefix means your tracker app handles requests at the root of the site**.
+
+When someone visits http://127.0.0.1:8000/add/, Django first checks fitness_project/urls.py. It matches the empty prefix and delegates to tracker/urls.py. There, it matches add/ and calls the add_workout view.
+
+## How to Test the Application Locally
+
+
