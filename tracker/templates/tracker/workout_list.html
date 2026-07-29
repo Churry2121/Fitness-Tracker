@@ -19,6 +19,12 @@
             padding: 2rem;
         }
 
+        .header_container {
+            padding: 50px;
+            text-align: center;
+            font-size: 30px;
+        }
+
         .container {
             max-width: 700px;
             margin: 0 auto;
@@ -43,19 +49,28 @@
 
         .add-link:hover {
             background-color: #3a56d4;
+        }
 
+        .center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .workout-card {
             background: white;
             border-radius: 8px;
             padding: 1rem 1.2rem;
-            margin-bottom: 0.8rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-bottom: 16px;    /* creates the gap between cards */
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
 
+        .workout-card:hover {
+            box-sizing: 0 8px 20px rgba(0, 0, 0, 1);  /* stronger shadow on hover */
+            transform: translateY(-2px);    /*subtle lift effect */
         }
 
         .workout-activity {
@@ -82,14 +97,17 @@
     {# You use the {% %} when you need Django to acutally perform an aciton or apply logic (e.g. running a loop, checking conditons, etc) #}
     {# Use the double curry braces ({{}}) when you want to output or display a piece of data directly onto the page #}
     
+    <div class="header_container"><h1>My Workouts</h1></div>
+
+    <div class="center"><a href="{% url 'add_workout' %}" class="add-link">+ Log a Workout</a></div>
+
     <div class="container">
-        <h1>My Workouts</h1>
         {% comment %}
         Django uses the {% url %} tag to generate the link dynamically.
         You pass it the name of the route (in this case, add_workout),
         and Django automatically figures out the correct URL path
         {% endcomment %}
-        <a href="{% url 'add_workout' %}" class="add-link">+ Log a Workout</a>
+
         {% if workouts %}
             {% for workout in workouts %}
                 <div class="workout-card">
