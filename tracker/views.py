@@ -20,3 +20,15 @@ def add_workout(request):
     else:
         form = WorkoutForm()
     return render(request, 'tracker/add_workout.html', {'form': form})
+
+def del_workout(request, pk):
+    workout = Workout.objects.get(id=pk)
+
+    if request.method == 'POST':
+        # delete the band from the database
+        workout.delete()
+        # redirect to the workout list
+        return redirect('workout_list')
+
+    return render(request, 'tracker/delete_workout.html', {'workout': workout})
+

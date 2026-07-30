@@ -195,6 +195,23 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 **Note:** For a production app handling real user data, you would also want to set a secure SECRET_KEY, configure a proper database like PostgreSQL, and set up HTTPS. But for a learning project, these changes are enough.
 
-# Edit/Delete Button
+## Trials & Error
+When trying to link a delete icon to a template (delete_workout.html), I did this:
+```html
+<div>
+    <a href="{% url 'delete_workout' %}"><i class="material-symbols-outlined">delete</i></a>
+</div>
+```
+Django returned a NoReverseMatch error; Reverse for 'delete_workout' with no arguments not found. 1 pattern(s) tried: ['delete/(?P<pk>[0-9]+)\\Z']
+
+In the tracker/urls.py file, my url path for the delete_workout template was this: `path('delete/<int:pk>',...)`, meaning it is expecting a pk argument `(delete/(?P<pk>[0-9]+))`, but in workout_list.html I am calling it with no argument:
+```html
+<a href="{% url 'delete_workout' %}">
+```
+
+I need to pass the specific workout's primary key so Django knows which workout to delete:
+```html
+<a href="{% url 'delete_workout' workout.pk %}">
+```
 
 
