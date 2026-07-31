@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=delete" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=delete,edit" />
     <title>My Workouts</title>
     <style>
                 * {
@@ -70,7 +70,7 @@
         }
 
         .workout-card:hover {
-            box-sizing: 0 8px 20px rgba(0, 0, 0, 1);  /* stronger shadow on hover */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);  /* stronger shadow on hover */
             transform: translateY(-2px);    /*subtle lift effect */
         }
 
@@ -132,6 +132,7 @@
                         <div class="workout-details">{{ workout.date }}</div>
                     </div>
                     <div>
+                        <a href="{% url 'update_workout' workout.pk %}"><i class="material-symbols-outlined">edit</i></a>
                         <a href="{% url 'delete_workout' workout.pk %}"><i class="material-symbols-outlined">delete</i></a>
                     </div>
                     

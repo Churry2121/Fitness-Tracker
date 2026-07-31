@@ -214,4 +214,16 @@ I need to pass the specific workout's primary key so Django knows which workout 
 <a href="{% url 'delete_workout' workout.pk %}">
 ```
 
+### Django Generic View: UpdateView
+An UpdateView is a built-in class-based view used to edit an existing record in the database. It automatically handles fetching the record, showing a pre-filled form, validating input, and saving changes.
+- Specify the model that contains the record to be updated.
+- Define the form fields that should appear in the update form.
+- Provide the template used to render the form.
+- Set a success URL to redirect after the update is saved.
+
+To create an UpdateView, it is only necessary to specify the model. Django’s UpdateView will then look for a template named app_name/modelname_form.html. Then, create a class-based view in tracker/views.py. Then, map it to tracker/urls.py
+
+### Function-Based views.update_workout
+`form = WorkoutForm(request.POST or None, instance=obj)`
+- instace=obj : since WorkoutForm is a ModelForm (defined in forms.py), Django looks at each field in the form, finds the matching attribute in obj (e.g. obj.activity, obj.duration, obj.date), and use those values as **initial data for each field's widget**.
 

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updating Workout</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #1a1a2e;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4361ee;
+
+        }
+
+        .btn {
+            background-color: #4361ee;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: #3a56d4;
+        }
+
+        .back-link {
+            color: #4361ee;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .error-list {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+
+        }
+    </style>
+<body>
+    <div class="container">
+       <h1>Updating Workout...</h1>
+        <form method="post">
+            {% csrf_token %} 
+            {%comment%}
+                Whenever you submit data to a server using a POST method, malicious sites can potentially intercept or forge that request.
+                By including this {% csrf_token %}, you tell Django to generate a unique hidden security key for the form. 
+                When the user clicks "Save Workout," Django checks this token to guarantee the request is legitimate. 
+                If you forget this tag, Django will reject your form. 
+            {% endcomment %}
+            <div class="form-group">
+                {# Instead of manually typing out all the HTML <input> tags for the activity, duration, and date, we let Django do it for us using display tags ({{}}) #}
+                {# The error blocks below each field display validation messages if a user submits invalid data, like entering text in the duration field. #}
+                {# {% if form.activity.errors %} - this code checks if the user mess up this specific field. If error is found, the block {{form.activity.errors}} displays an error message #}
+                <label for="id_activity">Activity</label>
+                {{ form.activity }}
+                {% if form.activity.errors %}
+                    <div class="error-list">{{ form.activity.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_duration">Duration (minutes)</label>
+                {{ form.duration }}
+                {% if form.duration.errors %}
+                    <div class="error-list">{{ form.duration.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_date">Date</label>
+                {{ form.date }}
+                {% if form.date.errors %}
+                    <div class="error-list">{{ form.date.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn">Update Workout</button>
+                <a href="{% url 'workout_list' %}" class="back-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
