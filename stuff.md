@@ -227,3 +227,11 @@ To create an UpdateView, it is only necessary to specify the model. Django’s U
 `form = WorkoutForm(request.POST or None, instance=obj)`
 - instace=obj : since WorkoutForm is a ModelForm (defined in forms.py), Django looks at each field in the form, finds the matching attribute in obj (e.g. obj.activity, obj.duration, obj.date), and use those values as **initial data for each field's widget**.
 
+### Using ForeignKey
+Workout (id=5, "Push Day")          Exercise (id=12, "Bench Press")
+        \                                   /
+         \                                 /
+          WorkoutExercise (id=1)
+          - workout_id = 5   <- FK to Workout
+          - exercise_id = 12 <- FK to Exercise
+          - sets = 4, reps = 8, weight = 135
