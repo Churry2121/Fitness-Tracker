@@ -235,3 +235,79 @@ Workout (id=5, "Push Day")          Exercise (id=12, "Bench Press")
           - workout_id = 5   <- FK to Workout
           - exercise_id = 12 <- FK to Exercise
           - sets = 4, reps = 8, weight = 135
+
+### Loading the exercise.json file
+Create a folder in your app: management/commands/exercise.json
+
+```python
+import json
+from pathlib import Path # modern way to handle file paths
+from django.core.management.base import BaseCommand # Every custom Django management command (the things you run with python manage.py <something>) must inherit from BaseCommand.
+from tracker.models import Exercise
+
+class Command(BaseCommand):
+    help = "Load exercises from a JSON file into the Exercise model" # This is the description shown when you run python manage.py help load_exercises.
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--file', # defines optional --file flag
+            type=str,
+            default='tracker/fixtures/exercises.json', # if --file isn't passed, this is the default file path
+            help='Path to the JSON file'
+        )
+
+        # so, this lets you run the command: python manage.py load_exercises
+
+    def handle(self, *args, **options):
+        file_path = Path(options['file'])
+
+        if not file_path.exists():
+            self.stderr.write(self.style.ERROR(f"File not found: {file_path}"))
+            return
+
+        with open(file_path, 'r', encoding='utf-8') as f: # reading the file as utf-8
+            data = json.load(f)
+
+        created_count = 0
+        skipped_count = 0 # an exercise will be skipped when its name appears more than one in the database
+
+        for entry in data: # loops over each dict in the list
+            # Each entry looks like:
+            # {"name":"Barbell Squat", "instructions": "...", "muscle_group": "Legs"}}
+            exercise, created = Exercise.objects.get_or_create(
+                name=entry['name'],
+                defaults={
+                    'instructions': entry.get('instructions', ''),
+                    'muscle_group': entry.get('muscle_group', ''),
+                }
+            )
+
+            # counter is used for feedback
+            if created:
+                created_count += 1
+            else:
+                skipped_count += 1
+
+        self.stdout.write(self.style.SUCCESS(
+            f"Done. Created {created_count} exercises, skipped {skipped_count} duplicates."
+        ))  
+```
+The get_or_create does two things:
+- It looks in the database for an Exercise where name matches entry['name'].
+- If found, it returns that existing object and created=False.
+- If not found, it creates a new Exercise using name plus everything in defaults, and returns created=True.
+
+The name is the lookup key. The instructions and muscle_group of each entry is an empty string '' so if it is empty for that specific exercise, the app won't crash.
+
+Use self.stdout.write() instead of just print() because it respect Django's testing/output-capturing infrastructure (so tests can check command output cleanly)
+
+get_or_create first tries to find an Exercise row where name matches entry['name']. Only if it doesn't find one does it create a new row using name + whatever's in defaults. And if you run the `python manage.py load_exercises` command twice, the object was already created in the first run. Any new entries will then be created if added any. We use get_or_create instead of Exercises.objects.create() so there are no duplicates.
+
+get_or_create returns a tuple of two values: (object, created_boolean), which was why it's exercise, created. The created variable is then used for the counter for the terminal feedback.
+
+We need a whole separate WorkoutExercise model instead of just adding the fields (exercises, sets, etc) to Workout model because then it'll allow the user to add only one exercise to the workout. The WorkoutExercise models uses. Think of the Workout as the 'title' and the WorkoutExercise as the bullet points beneath it. Each WorkoutExercise model is a different bullet point, same workout_id, different exercise_id. That's a many-to-many relationship with extra data attached to each pairing. There's no way to represent "many exercises per workout, each with unique numbers" using flat fields on Workout alone.
+
+In forms.py, `inlineformset_factory(ParentModel, ChildModel, ...)` builds a set of forms for the child model (WorkoutExercise), all linked to one parent instance (Workout). It requires that WorkoutExercise has a ForeignKey to Workout (which it does).
+- can_delete=True : adds a checkbox to each row so users can mark existing entries for deletion (useful when editing a workout later, not as relevant on initial creation).
+
+In the templates, formset.management_form is used by the formset to manage the collection of forms contained in the formset. It is used to keep track of how many form instances are being displayed.

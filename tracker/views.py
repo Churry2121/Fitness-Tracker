@@ -3,7 +3,7 @@ from django.shortcuts import (render,
                               get_object_or_404, 
                               HttpResponseRedirect)
 from .models import Workout
-from .forms import WorkoutForm
+from .forms import WorkoutForm, WorkoutExerciseFormSet, WorkoutExerciseUpdateFormSet
 
 # from django.views.generic.edit import UpdateView
 
@@ -20,11 +20,18 @@ def add_workout(request):
     if request.method == 'POST':
         form = WorkoutForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('workout_list')
+            workout = form.save()  # save Workout first so it has a pk (aka. ad id number)
+            formset = WorkoutExerciseFormSet(request.POST, instance=workout) # once the workout is saved, we want to bind we bind the formset to it (instance=workout) so each WorkoutExercise row knows which workout it belongs to.
+            if formset.is_valid(): 
+                formset.save() # formset.save() creates all the WorkoutExercise rows in one go.
+                return redirect('workout_list')
+        else: # If WorkoutForm itself was invalid (e.g., missing title), we still need a formset variable defined so the template doesn't crash when it tries to render {{ formset.management_form }}
+            workout = WorkoutForm()
+            formset = WorkoutExerciseFormSet(request.POST)
     else:
         form = WorkoutForm()
-    return render(request, 'tracker/add_workout.html', {'form': form})
+        formset = WorkoutExerciseFormSet()
+    return render(request, 'tracker/add_workout.html', {'form': form, 'formset': formset})
 
 def del_workout(request, pk):
     workout = Workout.objects.get(id=pk)
@@ -37,18 +44,6 @@ def del_workout(request, pk):
 
     return render(request, 'tracker/delete_workout.html', {'workout': workout})
 
-# class WorkoutUpdateView(UpdateView):
-#     model = Workout
-
-#     # specify the fields
-#     fields = [
-#         "activity",
-#         "duration",
-#         "date"
-#     ]
-
-#     success_url = "/"
-
 def update_workout(request, pk):
     context = {} # dictionary for initial data with 
                 # field names as keys
@@ -56,10 +51,13 @@ def update_workout(request, pk):
     obj = get_object_or_404(Workout, id=pk)
 
     form = WorkoutForm(request.POST or None, instance=obj)
+    formset = WorkoutExerciseUpdateFormSet(request.POST or None, instance=obj)
 
-    if form.is_valid():
+    if form.is_valid() and formset.is_valid():
         form.save()
-        return redirect(workout_list)
+        formset.save()
+        return redirect('workout_list')
 
     context['form'] = form
+    context['formset'] = formset
     return render(request, "tracker/workout_form.html", context)

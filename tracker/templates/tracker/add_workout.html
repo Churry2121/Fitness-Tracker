@@ -115,13 +115,13 @@
                 If you forget this tag, Django will reject your form. 
             {% endcomment %}
             <div class="form-group">
-                {# Instead of manually typing out all the HTML <input> tags for the activity, duration, and date, we let Django do it for us using display tags ({{}}) #}
+                {# Instead of manually typing out all the HTML <input> tags for the title, duration, and date, we let Django do it for us using display tags ({{}}) #}
                 {# The error blocks below each field display validation messages if a user submits invalid data, like entering text in the duration field. #}
-                {# {% if form.activity.errors %} - this code checks if the user mess up this specific field. If error is found, the block {{form.activity.errors}} displays an error message #}
-                <label for="id_activity">Activity</label>
-                {{ form.activity }}
-                {% if form.activity.errors %}
-                    <div class="error-list">{{ form.activity.errors }}</div>
+                {# {% if form.title.errors %} - this code checks if the user mess up this specific field. If error is found, the block {{form.title.errors}} displays an error message #}
+                <label for="id_title">Title</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="error-list">{{ form.title.errors }}</div>
                 {% endif %}
             </div>
             <div class="form-group">
@@ -139,6 +139,14 @@
                     <div class="error-list">{{ form.date.errors }}</div>
                 {% endif %}
             </div>
+
+            <h3>Exercises</h3>
+            {{ formset.management_form }}
+            {% for exercise_form in formset %}
+                <div class="exercise-row">
+                    {{ exercise_form.as_p }}
+                </div>
+            {% endfor %}
 
             <div class="actions">
                 <button type="submit" class="btn">Save Workout</button>

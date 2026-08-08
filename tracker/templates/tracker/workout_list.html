@@ -127,7 +127,7 @@
             {% for workout in workouts %}
                 <div class="workout-card">
                     <div>
-                        <div class="workout-activity">{{ workout.activity }}</div>
+                        <div class="workout-activity">{{ workout.title }}</div>
                         <div class="workout-details">{{ workout.duration }} minutes</div>
                         <div class="workout-details">{{ workout.date }}</div>
                     </div>
@@ -137,6 +137,15 @@
                     </div>
                     
                 </div>
+                
+                <ul>
+                    {% for we in workout.workoutexercise_set.all %}
+                        <li>
+                            <strong>{{ we.exercise.name }}</strong>: {{ we.sets }} sets × {{ we.reps }} reps @ {{ we.weight }}lbs
+                            <p>{{ we.exercise.instructions }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
             {% endfor %}
 
         {% else %}
