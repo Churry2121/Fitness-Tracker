@@ -65,6 +65,7 @@
             margin-bottom: 16px;    /* creates the gap between cards */
             box-shadow: 0 2px 3px rgba(0, 0, 0, 0.08);
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
             align-items: center;
         }
@@ -97,6 +98,14 @@
 
         }
 
+        .exercises {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+        }
+
         .material-symbols-outlined {
             font-variation-settings:
                 'FILL' 0,
@@ -105,6 +114,11 @@
                 'opsz' 24
             ;
 
+        }
+
+        .exercise-instructions {
+            padding-left: 14px;
+            padding-bottom: 14px;
         }
     </style>
 </head>
@@ -135,17 +149,19 @@
                         <a href="{% url 'update_workout' workout.pk %}"><i class="material-symbols-outlined">edit</i></a>
                         <a href="{% url 'delete_workout' workout.pk %}"><i class="material-symbols-outlined">delete</i></a>
                     </div>
+
+                    <br>
                     
+                    <div class="exercises">
+                        <ul>
+                            {% for we in workout.workoutexercise_set.all %}
+                            <p><strong>{{ we.exercise.name }}</strong> - {{ we.sets }} sets × {{ we.reps }} reps @ {{ we.weight }}lbs</p>
+                                    <div class="exercise-instructions"><p>{{ we.exercise.instructions }}</p></div>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
-                
-                <ul>
-                    {% for we in workout.workoutexercise_set.all %}
-                        <li>
-                            <strong>{{ we.exercise.name }}</strong>: {{ we.sets }} sets × {{ we.reps }} reps @ {{ we.weight }}lbs
-                            <p>{{ we.exercise.instructions }}</p>
-                        </li>
-                    {% endfor %}
-                </ul>
+            
             {% endfor %}
 
         {% else %}
