@@ -311,3 +311,9 @@ In forms.py, `inlineformset_factory(ParentModel, ChildModel, ...)` builds a set 
 - can_delete=True : adds a checkbox to each row so users can mark existing entries for deletion (useful when editing a workout later, not as relevant on initial creation).
 
 In the templates, formset.management_form is used by the formset to manage the collection of forms contained in the formset. It is used to keep track of how many form instances are being displayed.
+
+### Search Feature on <Select> Drop-Down 
+Using select2 for an in-browser searchable <select>. Select2 replaces the plain <select> with a JS-enhanced dropdown that has a built-in search feature inside the dropdown itself. 
+
+To use Select2:
+1) 
