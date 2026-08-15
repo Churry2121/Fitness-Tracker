@@ -6,7 +6,7 @@ from tracker.models import Exercise
 class Command(BaseCommand):
     help = "Load exercises from a JSON file into the Exercise model" # This is the description shown when you run python manage.py help load_exercises.
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser): # for the extra command after `python manage.py load_exercises`
         parser.add_argument(
             '--file', # defines optional --file flag
             type=str,
@@ -35,7 +35,7 @@ class Command(BaseCommand):
             exercise, created = Exercise.objects.get_or_create(
                 name=entry['name'],
                 defaults={
-                    'instructions': entry.get('instructions', {}).get('en', ''),
+                    'instructions': entry.get('instructions', {}),
                     'muscle_group': entry.get('muscle_group', ''),
                 }
             )

@@ -18,7 +18,7 @@ WorkoutExerciseFormSet = inlineformset_factory(# to be able to log a workout w/ 
     fields=['exercise', 'sets', 'reps', 'weight'],
     extra=3,          # how many empty exercise rows to show
     widgets={
-        'exercise': Select(attrs={'class': 'exercise-select'}),
+        'exercise': Select(attrs={'class': 'exercise-select'}), # 'exercise-select' is just a label for the <script> tag in the templates file
     },
     can_delete=False
 )

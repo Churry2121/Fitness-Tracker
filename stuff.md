@@ -316,4 +316,36 @@ In the templates, formset.management_form is used by the formset to manage the c
 Using select2 for an in-browser searchable <select>. Select2 replaces the plain <select> with a JS-enhanced dropdown that has a built-in search feature inside the dropdown itself. 
 
 To use Select2:
-1) 
+1) in the WorkoutExerciseFormSet, add a widget for the exercise, where each exercise drop-down widget has the Select2 feature: 
+    `'exercise': Select(attrs={'class': 'exercise-select'})`
+2) In the add_workout.html template, in the <head>, add:
+    ```html
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    ```
+3) Then, on the bottom of the html file, after the <form> tag (and <div> tag), add:
+    ```html
+        <script>
+            $(document).ready(function() {
+                $('.exercise-select').select2({
+                    placeholder: 'Search for an exercise...',
+                    width: '100%'
+                });
+            });
+        </script>
+    ```
+
+### Loading the exercise.json file
+To load the json file, we need to create the file within two folders, management and commands. So the file path should look something like this: ../yourApp/management/commands.
+This is required because Django's command-discovery system works by scanning a fixed, predictable path inside every installed app. So, when you run `python manage.py load_exercises`, it doesn't go through your entire project files, just looking for the apps listed in INSTALLED_APPS for a folder literally named management/commands/, and treats every .py file in there as a potential command.
+
+Both management/__init__.py and management/commands/__init__.py are empty, but they're not optional files; they're what makes Python treat management/ and management/commands/ as packages (importable modules) rather than just plain folders.
+
+Once this structure is created, Django auto registers load_exercises as a subcommand. BaseCommand (which your Command class inherits from) handles the argument-parsing plumbing (add_arguments), the stdout/stderr styling helpers (self.style.SUCCESS, etc.), and the actual dispatch logic — you just fill in handle() with what should happen when the command runs.
+
+Django provides BaseCommand as a base class for us to subclass and create custom commands (similar to how we have an Exception base class that we can use to create custom exceptions in Python and Java). If you want to create another command, create another file under management/commands/.
+
+Every command file must define a class literally named Command. Django's loader doesn't care what you name the file variable-wise inside — it specifically looks for a class called Command in each file, because that's the convention it's built around.
+
+The command-line generation is fully automatic. The moment load_workouts.py exists in tracker/management/commands with a properly defined `class Command(BaseCommand)`, Django's command-discovery logic (which runs every time you invoke manage.py) picks it up automatically.

@@ -17,35 +17,6 @@ def workout_list(request): # this view handles the page that displays all workou
                                                                                 # data nad returns the finished HTML page
 
 def add_workout(request):
-    # search_form = ExerciseSearchForm(request.GET or None)
-    # exercise_qs = Exercise.objects.all()
-    # query = request.GET.get('query')
-
-    # if query:
-    #     exercise_qs = exercise_qs.filter(name__icontains=query)
-
-    # if request.method == 'POST':
-    #     form = WorkoutForm(request.POST)
-    #     formset = WorkoutExerciseFormSet(request.POST)
-    #     if form.is_valid() and formset.is_valid():
-    #         workout = form.save()
-    #         formset.instance = workout
-    #         formset.save()
-    #         return redirect('workout_list')
-    # else:
-    #     form = WorkoutForm()
-    #     formset = WorkoutExerciseFormSet()
-
-    # # apply the filtered queryset to every exercise dropdown in the formset
-    # for exercise_form in formset.forms:
-    #     exercise_form.fields['exercise'].queryset = exercise_qs
-
-    # return render(request, 'tracker/add_workout.html', {
-    #     'form': form,
-    #     'formset': formset,
-    #     'search_form': search_form,
-    # })
-   
     if request.method == 'POST':
         form = WorkoutForm(request.POST)
         formset = WorkoutExerciseFormSet(request.POST)

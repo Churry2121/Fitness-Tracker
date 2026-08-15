@@ -154,7 +154,7 @@
                     
                     <div class="exercises">
                         <ul>
-                            {% for we in workout.workoutexercise_set.all %}
+                            {% for we in workout.workoutexercise_set.all %} {# workoutexercise_set comes from Django's auto-generated reverse accessor name: <lowercase related model name>_set #}
                             <p><strong>{{ we.exercise.name }}</strong> - {{ we.sets }} sets × {{ we.reps }} reps @ {{ we.weight }}lbs</p>
                                     <div class="exercise-instructions"><p>{{ we.exercise.instructions }}</p></div>
                             {% endfor %}
