@@ -145,26 +145,74 @@
             </div>
 
             <h3>Exercises</h3>
+
             {{ formset.management_form }}
-            {% for exercise_form in formset %}
+            <div class="exercise-rows" id="exercise-rows">
+                {% for exercise_form in formset %}
+                    <div class="exercise-row" style="padding-bottom: 16px;">
+                        {{ exercise_form.as_p }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-exercise-btn" class="btn">+ Add Exercise</button>
+
+            <!-- Hidden template row, never submitted, used only for JS cloning -->
+            <div id="empty-form-template" style="display: none;">
                 <div class="exercise-row">
-                    {{ exercise_form.as_p }}
+                    {{ formset.empty_form.as_p }}
                 </div>
-            {% endfor %}
+            </div>
 
             <div class="actions">
                 <button type="submit" class="btn">Save Workout</button>
                 <a href="{% url 'workout_list' %}" class="back-link">Cancel</a>
             </div>
+
         </form>
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('.exercise-select').select2({
-                placeholder: 'Search for an exercise...',
-                width: '100%'
+        // Guarded init: only calls .select2() on elements that aren't already initialized,
+        // so this is safe to call repeatedly (on page load AND on newly added rows).
+        function initExerciseSelect2(context) {
+            $(context).find('.exercise-select').each(function() {
+                if (!$(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2({
+                        placeholder: 'Search for an exercise...',
+                        width: '100%'
+                    });
+                }
             });
+        }
+
+        // Initialize Select2 on the rows already present when the page loads
+        $(document).ready(function() {
+            initExerciseSelect2(document);
+        });
+
+        // + Add Exercise btn: clone the empty-form template, wire it into the
+        // formset, and initialize Select2 on just the new row
+        document.getElementById('add-exercise-btn').addEventListener('click', function() {
+            const formsetContainer = document.getElementById('exercise-rows');
+            const totalFormsInput = document.querySelector('#id_workoutexercise_set-TOTAL_FORMS');
+
+            const formIndex = parseInt(totalFormsInput.value);
+
+            // Clone the empty-form template and swap __prefix__ for the real index
+            const templateHtml = document.getElementById('empty-form-template').innerHTML;
+            const newFormHtml = templateHtml.replace(/__prefix__/g, formIndex);
+
+            // Insert the new row into the visible list
+            const newRow = document.createElement('div');
+            newRow.innerHTML = newFormHtml;
+            formsetContainer.appendChild(newRow);
+
+            // Tell Django's management form there's one more form now
+            totalFormsInput.value = formIndex + 1;
+
+            // Initialize Select2 on just the new row's exercise dropdown
+            initExerciseSelect2(newRow);
         });
     </script>
 </body>

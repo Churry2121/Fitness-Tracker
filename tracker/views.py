@@ -4,6 +4,7 @@ from django.shortcuts import (render,
                               HttpResponseRedirect)
 from .models import Workout
 from .forms import WorkoutForm, WorkoutExerciseFormSet, WorkoutExerciseUpdateFormSet
+from django.views.generic.base import TemplateView
 
 # from django.views.generic.edit import UpdateView
 
