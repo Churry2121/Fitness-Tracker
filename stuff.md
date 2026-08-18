@@ -349,3 +349,49 @@ Django provides BaseCommand as a base class for us to subclass and create custom
 Every command file must define a class literally named Command. Django's loader doesn't care what you name the file variable-wise inside — it specifically looks for a class called Command in each file, because that's the convention it's built around.
 
 The command-line generation is fully automatic. The moment load_workouts.py exists in tracker/management/commands with a properly defined `class Command(BaseCommand)`, Django's command-discovery logic (which runs every time you invoke manage.py) picks it up automatically.
+
+### Dynamically add Exercise Rows to the formset
+We want user to be able to add more exercise rows (since right now, there's only a fixed amoutn of exercises they can choose). To do this, we use Javascript in the templates. Underneath the form tag, we add a script tag (used for client-side Javascript code). Here's the code to let users dynamically add repeated groups of form fields:
+```js
+document.getElementById('add-exercise-btn').addEventListener('click', function() {
+    const formsetContainer = document.getElementById('exercise-rows');
+    const totalFormsInput = document.querySelector('#id_workoutexercise_set-TOTAL_FORMS');
+
+    const formIndex = parseInt(totalFormsInput.value);
+
+    const templateHtml = document.getElementById('empty-form-template').innerHTML;
+    const newFormHtml = templateHtml.replace(/__prefix__/g, formIndex);
+
+    const newRow = document.createElement('div');
+    newRow.innerHTML = newFormHtml;
+    formsetContainer.appendChild(newRow);
+
+    totalFormsInput.value = formIndex + 1;
+
+    initExerciseSelect2(newRow);
+});
+```
+- document.getElementById('add-exercise-btn').addEventListener('click',function() {}); : runs the whole block when the "+ Add Exercise" button is clicked.
+
+- const formsetContainer = document.getElementById('exercise-rows'); : Grabs the container element where all the individual exercise form rows live.
+
+- const totalFormsInput = document.querySelector('#id_workoutexercise_set-TOTAL_FORMS'); : track how many forms exist via a hidden management-form input named `<prefix>-TTOTAL_FORMS`. This grabs that hidden field; Django uses its value server-side to know how many rows to expect when the form is submitted.
+
+- const formIndex = parseInt(totalFormsInput.value); : reads the current count and converts it to a number. This becomes the index for the new row (e.g., if there are already 3 exercise rows, indices 0-2, the new one will be index 3).
+ 
+- const templateHtml = document.getElementById('empty-form-template').innerHTML; : Django's formset can render an "empyt form" template with __prefix__ as a placeholder instead of a real index (e.g. field names like workoutexercise_set-__prefix__-exercise). This grabs that raw HTML tempalte, usually hidden on the page for exactly this purpose.
+
+- const newFormHtml = templateHtml.replace(/__prefix__/g, formIndex); : replaces every occurrence of __prefix__ with the actual new index number, turning the placeholder template into real, uniquely-named form fields (e.g. workoutexercise_set-3-exercise).
+
+- const newRow = document.createElement('div');
+    newRow.innerHTML = newFormHtml;
+    formsetContainer.appendChild(newRow);
+
+    --> Creates a new <div>, stuffs the generated HTML inside it, and appends that div to the container, so the new row now appears on the page.
+
+- totalFormsInput.value = formIndex + 1; 
+    --> Increments the hidden TOTAL_FORMS count so Django knows there's now one more form to expec ton submit. This is !important!; w/o it, Django's formset validation won't even look at the new row's fields.
+
+- initExerciseSelect2(newRow);
+    --> Calls a custom function to initialize a Select2 dropdown widget on the new row, because Select2 (and similar JS plugins) don't auto-apply to elements added after the initial page load; you have to manually re-run the init on new DOM nodes.
+

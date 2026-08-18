@@ -1,10 +1,8 @@
 from django.shortcuts import (render, 
                               redirect, 
-                              get_object_or_404, 
-                              HttpResponseRedirect)
+                              get_object_or_404)
 from .models import Workout
 from .forms import WorkoutForm, WorkoutExerciseFormSet, WorkoutExerciseUpdateFormSet
-from django.views.generic.base import TemplateView
 
 # from django.views.generic.edit import UpdateView
 
