@@ -126,6 +126,8 @@
     {# You use the {% %} when you need Django to acutally perform an aciton or apply logic (e.g. running a loop, checking conditons, etc) #}
     {# Use the double curry braces ({{}}) when you want to output or display a piece of data directly onto the page #}
     
+    <a href="{% url 'logout' %}">Logout</a>
+    
     <div class="header_container"><h1>My Workouts</h1></div>
 
     <div class="center"><a href="{% url 'add_workout' %}" class="add-link">+ Log a Workout</a></div>

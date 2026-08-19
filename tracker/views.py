@@ -3,10 +3,30 @@ from django.shortcuts import (render,
                               get_object_or_404)
 from .models import Workout
 from .forms import WorkoutForm, WorkoutExerciseFormSet, WorkoutExerciseUpdateFormSet
-
-# from django.views.generic.edit import UpdateView
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required 
+from django.contrib import messages
 
 # Create your views here.
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('workout_list')
+        else:
+            messages.error(request, 'Invalid username or password')
+
+    return render(request, 'tracker/login.html')
+
+def user_logout(request):
+    logout(request)
+    return redirect('login')
+
+@login_required
 def workout_list(request): # this view handles the page that displays all workouts
                             # It queries the database for every Workout object, orders 
                             # them by date (most recent first, thanks to the - prefix), 

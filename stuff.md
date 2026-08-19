@@ -395,3 +395,36 @@ document.getElementById('add-exercise-btn').addEventListener('click', function()
 - initExerciseSelect2(newRow);
     --> Calls a custom function to initialize a Select2 dropdown widget on the new row, because Select2 (and similar JS plugins) don't auto-apply to elements added after the initial page load; you have to manually re-run the init on new DOM nodes.
 
+**Read more about dynamically adding forms with formsets and JS**: https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript
+
+## Creating a Login System
+In the tracker/views.py, add:
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Invalid username or password')
+    return render(request, 'tracker/login.html')
+
+@login_required
+def dashboard(request):
+    return render(request, 'tracker/dashboard.html')
+
+def user_logout(request):
+    logout(request)
+    return redirect('login')
+```
+- @login_required decorator restricts access to a view to authenticated users. Add the decorator before a view function to restrict acess to it. 
+
+
